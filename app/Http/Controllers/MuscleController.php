@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Forms\MuscleForm;
+use App\Http\Forms\Muscle\MuscleForm;
 use App\Logic\Muscle\MuscleLogic;
 use App\Models\Muscle;
 use Illuminate\Http\Request;
@@ -51,20 +51,24 @@ class MuscleController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store()
     {
         $form = $this->form(MuscleForm::class);
 
         if (!$form->isValid()) {
-            return redirect()->route('muscle.create')->withErrors($form->getErrors())->withInput();
+            return redirect()
+                ->route('muscle.create')
+                ->withErrors($form->getErrors())
+                ->withInput();
         }
 
         $this->muscleLogic->create(new Muscle($form->getFieldValues()));
 
-        return redirect()->route('muscle.index')->with('status-success', 'Success');
+        return redirect()
+            ->route('muscle.index')
+            ->with('status-success', 'Success');
     }
 
     /**
@@ -81,7 +85,8 @@ class MuscleController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Muscle  $muscle
+     * @param int $id
+     *
      * @return \Illuminate\Http\Response
      */
     public function edit(int $id)
@@ -100,21 +105,26 @@ class MuscleController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Muscle  $muscle
+     * @param int $id
+     *
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, int $id)
+    public function update(int $id)
     {
         $form = $this->form(MuscleForm::class);
 
         if (!$form->isValid()) {
-            return redirect()->route('muscle.edit', $id)->withErrors($form->getErrors())->withInput();
+            return redirect()
+                ->route('muscle.edit', $id)
+                ->withErrors($form->getErrors())
+                ->withInput();
         }
 
         $this->muscleLogic->update($id, new Muscle($form->getFieldValues()));
 
-        return redirect()->route('muscle.index')->with('status-success', 'Success');
+        return redirect()
+            ->route('muscle.index')
+            ->with('status-success', 'Success');
     }
 
     /**
@@ -127,6 +137,8 @@ class MuscleController extends Controller
     {
         $muscle->delete();
 
-        return redirect()->route('muscle.index')->with('status-success', 'Success');
+        return redirect()
+            ->route('muscle.index')
+            ->with('status-success', 'Success');
     }
 }

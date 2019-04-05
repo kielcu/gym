@@ -6,7 +6,7 @@
  * Time: 13:07
  */
 
-namespace App\Forms;
+namespace App\Http\Forms\Muscle;
 
 
 use Illuminate\Validation\Rule;
