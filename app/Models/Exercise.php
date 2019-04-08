@@ -28,4 +28,16 @@ class Exercise extends Model
             'id'
         );
     }
+
+    public function routines(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Routine::class,
+            'exercises_has_routine',
+            'exercise_id',
+            'routine_id',
+            'id',
+            'id'
+        );
+    }
 }
