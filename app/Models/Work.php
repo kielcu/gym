@@ -10,7 +10,7 @@ class Work extends Model
     protected $table = 'works';
 
     protected $fillable = [
-        'exercise_id',
+        'exercise_id', 'training_id',
         'series', 'weight', 'repeat', 'rest',
         'description'
     ];

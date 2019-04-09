@@ -17,3 +17,6 @@ Route::get('/', function () {
 
 Route::resource('muscle', 'MuscleController');
 Route::resource('exercise', 'ExerciseController');
+Route::resource('routine', 'RoutineController');
+Route::resource('training', 'TrainingController');
+Route::resource('work', 'WorkController');
