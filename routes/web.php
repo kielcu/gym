@@ -20,3 +20,12 @@ Route::resource('exercise', 'ExerciseController');
 Route::resource('routine', 'RoutineController');
 Route::resource('training', 'TrainingController');
 Route::resource('work', 'WorkController');
+
+Route::prefix('record')->name('record.')->group(function() {
+    Route::get('weight', 'RecordController@weight')->name('weight');
+    Route::get('bulk', 'RecordController@bulk')->name('bulk');
+});
+
+Route::prefix('statistic')->name('statistic.')->group(function() {
+    Route::get('/', 'StatisticController@work')->name('index');
+});
