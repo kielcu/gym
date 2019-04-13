@@ -11,6 +11,7 @@ namespace App\Repositories;
 
 use App\Models\Muscle;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Collection;
 
 class MuscleRepository
 {
@@ -35,5 +36,13 @@ class MuscleRepository
         Muscle::query()
             ->where('id', $id)
             ->update($muscle->toArray());
+    }
+
+    /**
+     * @return Collection|Muscle[]
+     */
+    public function getAllForSelect(): Collection
+    {
+        return Muscle::query()->select('id', 'name')->get();
     }
 }

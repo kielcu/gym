@@ -4,9 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Forms\Exercise\ExerciseForm;
 use App\Models\Exercise;
-use App\Models\Muscle;
+use App\Repositories\Exercise\ExerciseRepository;
+use App\Repositories\MuscleRepository;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Kris\LaravelFormBuilder\FormBuilderTrait;
 
 class ExerciseController extends Controller
@@ -26,16 +27,18 @@ class ExerciseController extends Controller
     /**
      * Show the form for creating a new resource.
      *
+     * @param MuscleRepository $muscleRepository
+     *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(MuscleRepository $muscleRepository): Response
     {
         $form = $this->form(ExerciseForm::class,[
             'method' => 'POST',
             'url' => route('exercise.store'),
             'model' => new Exercise(),
             'data' => [
-                'muscles' => Muscle::all()
+                'muscles' => $muscleRepository->getAllForSelect()
             ]
         ]);
 
@@ -45,14 +48,14 @@ class ExerciseController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param ExerciseRepository $exerciseRepository
+     *
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(ExerciseRepository $exerciseRepository)
     {
-        $form = $this->form(ExerciseForm::class,['data' => [
-            'muscles' => Muscle::all()
-        ]]);
+        /** @var ExerciseForm $form */
+        $form = $this->form(ExerciseForm::class);
 
         if (!$form->isValid()) {
             return redirect()
@@ -61,9 +64,7 @@ class ExerciseController extends Controller
                 ->withInput();
         }
 
-        /** @var Exercise $exercise */
-        $exercise = Exercise::query()->create($form->getFieldValues());
-        $exercise->muscles()->attach($form->getFieldValues()['muscles']);
+        $exerciseRepository->createWithRelations($form->mapExercise());
 
         return redirect()
             ->route('exercise.index')
@@ -76,7 +77,7 @@ class ExerciseController extends Controller
      * @param  \App\Models\Exercise  $exercise
      * @return \Illuminate\Http\Response
      */
-    public function show(Exercise $exercise)
+    public function show(Exercise $exercise): Response
     {
         $exercise->load([
             'muscles' => function(BelongsToMany $query) {
@@ -88,17 +89,19 @@ class ExerciseController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Exercise  $exercise
+     * @param  \App\Models\Exercise $exercise
+     * @param MuscleRepository $muscleRepository
+     *
      * @return \Illuminate\Http\Response
      */
-    public function edit(Exercise $exercise)
+    public function edit(Exercise $exercise, MuscleRepository $muscleRepository): Response
     {
         $form = $this->form(ExerciseForm::class,[
             'method' => 'PUT',
             'url' => route('exercise.update', $exercise->id),
             'model' => $exercise,
             'data' => [
-                'muscles' => Muscle::all()
+                'muscles' => $muscleRepository->getAllForSelect()
             ]
         ]);
 
@@ -108,17 +111,16 @@ class ExerciseController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request $request
      * @param  \App\Models\Exercise $exercise
      *
+     * @param ExerciseRepository $exerciseRepository
+     *
      * @return \Illuminate\Http\Response
-     * @throws \Throwable
      */
-    public function update(Exercise $exercise)
+    public function update(Exercise $exercise, ExerciseRepository $exerciseRepository): Response
     {
-        $form = $this->form(ExerciseForm::class,['data' => [
-            'muscles' => Muscle::all()
-        ]]);
+        /** @var ExerciseForm $form */
+        $form = $this->form(ExerciseForm::class);
 
         if (!$form->isValid()) {
             return redirect()
@@ -127,12 +129,9 @@ class ExerciseController extends Controller
                 ->withInput();
         }
 
-        $exercise->update($form->getFieldValues());
+        $exercise = $form->mapExercise($exercise);
 
-        \DB::transaction(function() use($exercise, $form) {
-            $exercise->muscles()->detach();
-            $exercise->muscles()->attach($form->getFieldValues()['muscles']);
-        });
+        $exerciseRepository->updateWithRelations($exercise);
 
         return redirect()
             ->route('exercise.index')
@@ -144,12 +143,13 @@ class ExerciseController extends Controller
      *
      * @param  \App\Models\Exercise $exercise
      *
+     * @param ExerciseRepository $exerciseRepository
+     *
      * @return \Illuminate\Http\Response
-     * @throws \Exception
      */
-    public function destroy(Exercise $exercise)
+    public function destroy(Exercise $exercise, ExerciseRepository $exerciseRepository): Response
     {
-        $exercise->delete();
+        $exerciseRepository->delete($exercise);
 
         return redirect()
             ->route('exercise.index')
