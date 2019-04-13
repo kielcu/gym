@@ -3,10 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Forms\Muscle\MuscleForm;
-use App\Logic\Muscle\MuscleLogic;
 use App\Models\Muscle;
-use App\Repositories\MuscleRepository;
-use Illuminate\Http\Request;
+use App\Repositories\Muscle\MuscleRepository;
 use Kris\LaravelFormBuilder\FormBuilderTrait;
 
 class MuscleController extends Controller

@@ -6,7 +6,7 @@
  * Time: 15:03
  */
 
-namespace App\Repositories;
+namespace App\Repositories\Muscle;
 
 
 use App\Models\Muscle;
