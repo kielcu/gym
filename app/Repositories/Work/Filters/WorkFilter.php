@@ -6,7 +6,7 @@
  * Time: 13:31
  */
 
-namespace App\Filters\Work;
+namespace App\Repository\Work\Filters;
 
 
 use App\Filters\Filters;
