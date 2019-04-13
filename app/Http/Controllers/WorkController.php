@@ -4,12 +4,24 @@ namespace App\Http\Controllers;
 
 use App\Http\Forms\Work\WorkForm;
 use App\Models\Work;
+use App\Repositories\Work\WorkRepository;
 use Illuminate\Http\Request;
 use Kris\LaravelFormBuilder\FormBuilderTrait;
 
 class WorkController extends Controller
 {
     use FormBuilderTrait;
+
+
+    /**
+     * @var WorkRepository
+     */
+    private $workRepository;
+
+    public function __construct(WorkRepository $workRepository)
+    {
+        $this->workRepository = $workRepository;
+    }
 
     /**
      * Display a listing of the resource.
@@ -40,11 +52,11 @@ class WorkController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store()
     {
+        /** @var WorkForm $form */
         $form = $this->form(WorkForm::class);
 
         if (!$form->isValid()) {
@@ -54,7 +66,7 @@ class WorkController extends Controller
                 ->withInput();
         }
 
-        Work::query()->create($form->getFieldValues());
+        $this->workRepository->create($form->mapWork());
 
         return redirect()
             ->route('work.index')
@@ -75,7 +87,8 @@ class WorkController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param Work $work
+     *
      * @return \Illuminate\Http\Response
      */
     public function edit(Work $work)
@@ -92,12 +105,13 @@ class WorkController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param Work $work
+     *
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Work $work)
+    public function update(Work $work)
     {
+        /** @var WorkForm $form */
         $form = $this->form(WorkForm::class);
 
         if (!$form->isValid()) {
@@ -107,7 +121,7 @@ class WorkController extends Controller
                 ->withInput();
         }
 
-        $work->update($form->getFieldValues());
+        $this->workRepository->update($form->mapWork($work));
 
         return redirect()
             ->route('work.index')
@@ -117,12 +131,13 @@ class WorkController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param Work $work
+     *
      * @return \Illuminate\Http\Response
      */
     public function destroy(Work $work)
     {
-        $work->delete();
+        $this->workRepository->delete($work);
 
         return redirect()
             ->route('work.index')

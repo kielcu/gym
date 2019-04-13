@@ -2,6 +2,7 @@
 
 namespace App\Http\Forms\Work;
 
+use App\Models\Work;
 use Kris\LaravelFormBuilder\Form;
 
 class WorkForm extends Form
@@ -57,5 +58,16 @@ class WorkForm extends Form
                 'sometimes',
             ]
         ]);
+    }
+
+    public function mapWork(Work $work = null): Work
+    {
+        if (!$work) {
+            $work = new Work();
+        }
+
+        $work->fill($this->getFieldValues());
+
+        return $work;
     }
 }
