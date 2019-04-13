@@ -9,7 +9,11 @@
 namespace App\Repositories\Work;
 
 
+use App\Filters\Filters;
 use App\Models\Work;
+use App\Repository\Work\Filters\WorkFilter;
+use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Collection;
 
 class WorkRepository
 {
@@ -30,5 +34,16 @@ class WorkRepository
     public function delete(Work $work): void
     {
         $work->delete();
+    }
+
+
+    /**
+     * @return Collection|Work[]
+     */
+    public function filterWork(): Collection
+    {
+        $query = Work::query();
+
+        return app(WorkFilter::class)->apply($query)->get();
     }
 }

@@ -21,14 +21,14 @@ class WorkFilter extends Filters
         'end'
     ];
 
-    public function exercise(int $id)
+    public function exercise($id)
     {
         $this->builder->where('exercise_id', $id);
     }
 
-    public function muscle(int $id)
+    public function muscle($id)
     {
-        $this->builder->whereRaw('exercises_id in (Select exercise_id From exercises_has_muscles where muscle_id = ' . $id . ')');
+        $this->builder->whereRaw('exercise_id in (Select exercise_id From exercises_has_muscles where muscle_id = ' . $id . ')');
     }
 
     public function routine($id)

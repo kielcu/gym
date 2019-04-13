@@ -9,14 +9,12 @@
 namespace App\Http\Controllers;
 
 
-use App\Filters\Work\WorkFilter;
-use App\Models\Work;
+use App\Repositories\Work\WorkRepository;
 
 class StatisticController extends Controller
 {
-    public function work(\Request $request, WorkFilter $workFilter)
+    public function work(WorkRepository $workRepository)
     {
-        $work = Work::query();
-        $filter = $workFilter->apply($work);
+        $filters = $workRepository->filterWork();
     }
 }
