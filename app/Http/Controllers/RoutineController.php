@@ -4,12 +4,24 @@ namespace App\Http\Controllers;
 
 use App\Http\Forms\Routine\RoutineForm;
 use App\Models\Routine;
+use App\Repositories\Routine\RoutineRepository;
 use Illuminate\Http\Request;
 use Kris\LaravelFormBuilder\FormBuilderTrait;
 
 class RoutineController extends Controller
 {
     use FormBuilderTrait;
+
+    /**
+     * @var RoutineRepository
+     */
+    private $routineRepository;
+
+    public function __construct(RoutineRepository $routineRepository)
+    {
+        $this->routineRepository = $routineRepository;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -39,11 +51,11 @@ class RoutineController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store()
     {
+        /** @var RoutineForm $form */
         $form = $this->form(RoutineForm::class);
 
         if (!$form->isValid()) {
@@ -53,7 +65,7 @@ class RoutineController extends Controller
                 ->withInput();
         }
 
-        Routine::query()->create($form->getFieldValues());
+        $this->routineRepository->create($form->mapRoutine());
 
         return redirect()
             ->route('routine.index')
@@ -91,12 +103,13 @@ class RoutineController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param Routine $routine
+     *
      * @return \Illuminate\Http\Response
      */
     public function update(Routine $routine)
     {
+        /** @var RoutineForm $form */
         $form = $this->form(RoutineForm::class);
 
         if (!$form->isValid()) {
@@ -106,7 +119,7 @@ class RoutineController extends Controller
                 ->withInput();
         }
 
-        $routine->update($form->getFieldValues());
+        $this->routineRepository->update($form->mapRoutine($routine));
 
         return redirect()
             ->route('routine.index')
@@ -121,7 +134,7 @@ class RoutineController extends Controller
      */
     public function destroy(Routine $routine)
     {
-        $routine->delete();
+        $this->routineRepository->delete($routine);
 
         return redirect()
             ->route('routine.index')
