@@ -26,9 +26,11 @@ class MuscleRepository
         return Muscle::query()->findOrFail($id);
     }
 
-    public function create(Muscle $muscle)
+    public function create(Muscle $muscle): Muscle
     {
         $muscle->save();
+
+        return $muscle;
     }
 
     public function updateById(int $id, Muscle $muscle)
@@ -44,5 +46,17 @@ class MuscleRepository
     public function getAllForSelect(): Collection
     {
         return Muscle::query()->select('id', 'name')->get();
+    }
+
+    public function update(Muscle $muscle): Muscle
+    {
+        $muscle->save();
+
+        return $muscle;
+    }
+
+    public function delete(Muscle $muscle): void
+    {
+        $muscle->delete();
     }
 }

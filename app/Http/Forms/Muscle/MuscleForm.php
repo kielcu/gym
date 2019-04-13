@@ -9,6 +9,7 @@
 namespace App\Http\Forms\Muscle;
 
 
+use App\Models\Muscle;
 use Illuminate\Validation\Rule;
 use Kris\LaravelFormBuilder\Form;
 
@@ -19,6 +20,17 @@ class MuscleForm extends Form
         $this->setNameField();
 
         $this->add('submit', 'submit');
+    }
+
+    public function mapMuscle(Muscle $muscle): Muscle
+    {
+        if (!$muscle) {
+            $muscle = new Muscle();
+        }
+
+        $muscle->fill($this->getFieldValues());
+
+        return $muscle;
     }
 
     protected function setNameField()

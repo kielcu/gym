@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Forms\Muscle\MuscleForm;
 use App\Logic\Muscle\MuscleLogic;
 use App\Models\Muscle;
+use App\Repositories\MuscleRepository;
 use Illuminate\Http\Request;
 use Kris\LaravelFormBuilder\FormBuilderTrait;
 
@@ -13,13 +14,13 @@ class MuscleController extends Controller
     use FormBuilderTrait;
 
     /**
-     * @var MuscleLogic
+     * @var MuscleRepository
      */
-    private $muscleLogic;
+    private $muscleRepository;
 
-    public function __construct(MuscleLogic $muscleLogic)
+    public function __construct(MuscleRepository $muscleRepository)
     {
-        $this->muscleLogic = $muscleLogic;
+        $this->muscleRepository = $muscleRepository;
     }
 
     /**
@@ -55,6 +56,7 @@ class MuscleController extends Controller
      */
     public function store()
     {
+        /** @var MuscleForm $form */
         $form = $this->form(MuscleForm::class);
 
         if (!$form->isValid()) {
@@ -64,7 +66,7 @@ class MuscleController extends Controller
                 ->withInput();
         }
 
-        $this->muscleLogic->create(new Muscle($form->getFieldValues()));
+        $this->muscleRepository->create($form->mapMuscle());
 
         return redirect()
             ->route('muscle.index')
@@ -105,22 +107,23 @@ class MuscleController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param int $id
+     * @param Muscle $muscle
      *
      * @return \Illuminate\Http\Response
      */
-    public function update(int $id)
+    public function update(Muscle $muscle)
     {
+        /** @var MuscleForm $form */
         $form = $this->form(MuscleForm::class);
 
         if (!$form->isValid()) {
             return redirect()
-                ->route('muscle.edit', $id)
+                ->route('muscle.edit', $muscle->id)
                 ->withErrors($form->getErrors())
                 ->withInput();
         }
 
-        $this->muscleLogic->update($id, new Muscle($form->getFieldValues()));
+        $this->muscleRepository->update($form->mapMuscle($muscle));
 
         return redirect()
             ->route('muscle.index')
@@ -135,7 +138,7 @@ class MuscleController extends Controller
      */
     public function destroy(Muscle $muscle)
     {
-        $muscle->delete();
+        $this->muscleRepository->delete($muscle);
 
         return redirect()
             ->route('muscle.index')
