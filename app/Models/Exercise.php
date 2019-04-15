@@ -11,7 +11,7 @@ class Exercise extends Model
     protected $table = 'exercises';
 
     protected $fillable = [
-        'name'
+        'name', 'video'
     ];
 
     protected $guarded = [
@@ -45,5 +45,10 @@ class Exercise extends Model
     public function works(): HasMany
     {
         return $this->hasMany(Work::class, 'exercise_id', 'id');
+    }
+
+    public function pictures(): HasMany
+    {
+        return $this->hasMany(PictureExercise::class, 'exercise_id', 'id');
     }
 }

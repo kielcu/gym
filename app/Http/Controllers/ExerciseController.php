@@ -5,9 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Forms\Exercise\ExerciseForm;
 use App\Models\Exercise;
 use App\Repositories\Exercise\ExerciseRepository;
-use App\Repositories\MuscleRepository;
+use App\Repositories\Muscle\MuscleRepository;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Http\Response;
+use Illuminate\View\View;
 use Kris\LaravelFormBuilder\FormBuilderTrait;
 
 class ExerciseController extends Controller
@@ -29,9 +30,9 @@ class ExerciseController extends Controller
      *
      * @param MuscleRepository $muscleRepository
      *
-     * @return \Illuminate\Http\Response
+     * @return View
      */
-    public function create(MuscleRepository $muscleRepository): Response
+    public function create(MuscleRepository $muscleRepository): View
     {
         $form = $this->form(ExerciseForm::class,[
             'method' => 'POST',
@@ -74,10 +75,11 @@ class ExerciseController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Exercise  $exercise
-     * @return \Illuminate\Http\Response
+     * @param  \App\Models\Exercise $exercise
+     *
+     * @return View
      */
-    public function show(Exercise $exercise): Response
+    public function show(Exercise $exercise): View
     {
         $exercise->load([
             'muscles' => function(BelongsToMany $query) {

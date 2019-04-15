@@ -9,7 +9,10 @@
 namespace App\Repositories\Exercise;
 
 
+use App\Logic\Picture\UploadPictureLogic;
 use App\Models\Exercise;
+use App\Models\PictureExercise;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 
 class ExerciseRepository
@@ -44,6 +47,22 @@ class ExerciseRepository
         if ($muscles = $exercise->getRelation('muscles')) {
             /** @var Collection $muscles */
             $exercise->muscles()->attach($muscles->pluck('id'));
+        }
+    }
+
+    public function createRelationPicture(Exercise $exercise, UploadedFile ...$pictures)
+    {
+        $images = collect([]);
+        foreach ($pictures as $pictureType => $picture) {
+            $image = app(UploadPictureLogic::class)->uploadExercise($picture, $exercise, $pictureType);
+            new PictureExercise([
+                'name' => $image->filename,
+                'path' => $image->dirname,
+                'extension' => $image->extension,
+                'type' => $pictureType,
+            ]);
+
+            $images->push();
         }
     }
 

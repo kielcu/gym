@@ -2,8 +2,9 @@
 
 namespace App\Http\Forms\Exercise;
 
+use App\Mapper\Exercise\FromExerciseMapper;
 use App\Models\Exercise;
-use App\Models\Muscle;
+use App\ModelTypes\PictureExerciseType;
 use Illuminate\Support\Collection;
 use Kris\LaravelFormBuilder\Form;
 
@@ -15,7 +16,24 @@ class ExerciseForm extends Form
 
         $this->setMusclesField();
 
+        $this->add('video', 'text');
+
+        foreach (PictureExerciseType::getAll() as $type) {
+            $this->add('pictures['.$type.']', 'file', [
+//            'default_value' => function() {
+//                $this->getExercise()->pictures->first(function(PictureExercise $pictureExercise) {
+//                    return $pictureExercise->type == PictureExerciseType::START;
+//                });
+//            }
+            ]);
+        }
+
         $this->add('submit', 'submit');
+    }
+
+    public function getExercise(): Exercise
+    {
+        return $this->getModel();
     }
 
     public function mapExercise(Exercise $exercise = null): Exercise
@@ -24,21 +42,7 @@ class ExerciseForm extends Form
             $exercise = new Exercise();
         }
 
-        $exercise->fill($this->getFieldValues());
-
-        $muscles = collect([]);
-        foreach ($this->getFieldValues()['muscles'] as $value) {
-            $muscle = new Muscle();
-            $muscle->id = $value;
-
-            $muscles->push($muscle);
-        }
-
-        $exercise->setRelations([
-            'muscles' => $muscles
-        ]);
-
-        return $exercise;
+        return app(FromExerciseMapper::class)->map($exercise, $this->getFieldValues());
     }
 
     /**
